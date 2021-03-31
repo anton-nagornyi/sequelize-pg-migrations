@@ -21,10 +21,13 @@ const determinConfigs = (): Config => {
     throw new Error('pg-diff-config.json is missing. Place it inside project\'s root folder');
   }
 
-  const seq = import(path.join(execPath, '.sequelizerc')) as any;
+  const seqConf = path.join(execPath, '.sequelizerc');
+  // eslint-disable-next-line global-require,import/no-dynamic-require
+  const seq = fs.existsSync(seqConf) ? require(seqConf) as any : undefined;
   const res = {} as Config;
   res.migrationsPath = !seq || !seq['migrations-path'] ? path.join(execPath, 'migrations') : seq['migrations-path'];
-  res.pgDiffConf = import(path.join(execPath, 'pg-diff-config.json'));
+  // eslint-disable-next-line global-require,import/no-dynamic-require
+  res.pgDiffConf = require(path.join(execPath, 'pg-diff-config.json'));
   res.cwd = execPath;
   return res;
 };
