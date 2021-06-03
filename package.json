@@ -1,6 +1,6 @@
 {
   "name": "sequelize-pg-migrations",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Generate sequelize compatible migrations file by comparing postgres databases",
   "keywords": [
     "sequelize",

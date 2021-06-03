@@ -3,6 +3,7 @@ import path from 'path';
 import crypto from 'crypto';
 import * as child_process from 'child_process';
 import { DateTime } from 'luxon';
+import { postprocess } from './postprocess';
 
 export const npx = /^win/.test(process.platform) ? 'npx.cmd' : 'npx';
 
@@ -106,7 +107,8 @@ module.exports = {
   const tm = d.toISOTime().substr(0, 8).replace(/:/g, '');
   const sum = crypto.createHash('md5').update(`${forward.join()}${backward.join()}`).digest('hex');
   const file = path.join(outDir, `${dt}${tm}-${sum}.js`);
-  fs.writeFileSync(file, template.replace(upMarker, statementsToQueries(forward)).replace(downMarker, statementsToQueries(backward)), 'utf8');
+  const migrationData = template.replace(upMarker, statementsToQueries(forward)).replace(downMarker, statementsToQueries(backward));
+  fs.writeFileSync(file, postprocess(migrationData), 'utf8');
 
   console.log(`Created migration file at: ${file}`);
 };
