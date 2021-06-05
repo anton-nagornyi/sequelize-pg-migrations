@@ -82,9 +82,9 @@ const getStatementsByDirection = async (direction: string): Promise<string[]> =>
 });
 
 const statementsToQueries = (statements: string[]): string => (
-  `return queryInterface.sequelize.transaction(transaction, () => {
+  `queryInterface.sequelize.transaction(async (transaction) => {
     ${statements.map((s) => `await queryInterface.sequelize.query(\`${s.includes('\n') ? '\n    ' : ''}${s}\`, {transaction});`).join('\n    ')}
-})`);
+    })`);
 
 const genMigrationFile = (forward: string[], backward: string[]) => {
   const upMarker = '==up==';
@@ -93,13 +93,9 @@ const genMigrationFile = (forward: string[], backward: string[]) => {
   const template = `'use strict';
 
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
-    ${upMarker}
-  },
+  up: async (queryInterface, Sequelize) => ${upMarker},
 
-  down: async (queryInterface, Sequelize) => {
-    ${downMarker}
-  }
+  down: async (queryInterface, Sequelize) => ${downMarker}
 };`;
 
   const outDir = config.migrationsPath;
