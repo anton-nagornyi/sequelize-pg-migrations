@@ -81,7 +81,10 @@ const getStatementsByDirection = async (direction: string): Promise<string[]> =>
   });
 });
 
-const statementsToQueries = (statements: string[]): string => statements.map((s) => `await queryInterface.sequelize.query(\`${s.includes('\n') ? '\n    ' : ''}${s}\`);`).join('\n    ');
+const statementsToQueries = (statements: string[]): string => (
+  `return queryInterface.sequelize.transaction(transaction, () => {
+    ${statements.map((s) => `await queryInterface.sequelize.query(\`${s.includes('\n') ? '\n    ' : ''}${s}\`, {transaction});`).join('\n    ')}
+})`);
 
 const genMigrationFile = (forward: string[], backward: string[]) => {
   const upMarker = '==up==';
